@@ -1,0 +1,11 @@
+# Base dependencies (assuming these are needed, adjust if necessary)
+langchain
+google-generativeai
+python-dotenv
+
+# API dependencies (Removed for Agente Literario)
+# fastapi
+# uvicorn[standard]
+
+# Database dependencies (Removed for Agente Literario)
+# pymongo

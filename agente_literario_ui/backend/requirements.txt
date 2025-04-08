@@ -1,0 +1,3 @@
+fastapi
+uvicorn[standard]
+python-dotenv # Optional, for managing environment variables if needed
