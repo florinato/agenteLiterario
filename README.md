@@ -22,8 +22,10 @@ Para instalar y ejecutar este proyecto, siga estos pasos:
 ## Advertencia
 
 Este proyecto está diseñado para utilizar la API de Gemini. Para su correcto funcionamiento, necesitará proporcionar una API key de Gemini en el archivo .env.
-
 Alternativamente, puede adaptar el proyecto para que funcione con Ollama u otro modelo de lenguaje de su elección.
+
+El modelo ejecuta comandos en Powershel para hacer las operaciones, pero aún no se ha implementado el módulo de seguridad.
+Alternativamente, puede puede usar docker o sandbox para ejecutar el proyecto.
 
 ## Descripción del Proyecto
 
