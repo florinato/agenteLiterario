@@ -4,7 +4,7 @@ Este es un proyecto de Agente Literario.
 
 ## Captura de Pantalla
 
-![Captura de pantalla](./Captura de pantalla 2025-04-08 201807.png)
+![Captura de pantalla](Captura%20de%20pantalla%202025-04-08%20201807.png)
 
 ## Instalación
 
@@ -18,6 +18,12 @@ Para instalar y ejecutar este proyecto, siga estos pasos:
 6.  Ejecute la aplicación: `python run.py`
 
 ¡Disfrute de su Agente Literario!
+
+## Advertencia
+
+Este proyecto está diseñado para utilizar la API de Gemini. Para su correcto funcionamiento, necesitará proporcionar una API key de Gemini en el archivo .env.
+
+Alternativamente, puede adaptar el proyecto para que funcione con Ollama u otro modelo de lenguaje de su elección.
 
 ## Descripción del Proyecto
 
