@@ -8,11 +8,10 @@ from langchain.memory import ConversationBufferMemory
 from langchain.prompts.prompt import PromptTemplate
 
 # Local imports
-import communication
-import executor
-import logging_manager
-import security
-from model_integration import GeminiLLM  # Importar la clase LLM directamente
+from agente_literario_ui.backend import (communication, executor,
+                                         logging_manager, security)
+from agente_literario_ui.backend.model_integration import \
+    GeminiLLM  # Importar la clase LLM directamente
 
 # Definir la plantilla del prompt para Langchain
 with open("system_prompt.txt", "r", encoding="utf-8") as f:
@@ -55,12 +54,18 @@ def main():
         # Bucle de iteración autónoma para una consulta de usuario
         while True:
             # Obtener respuesta del modelo
-            model_response_raw = conversation.predict(input=current_input)
-            # No loguear la primera respuesta cruda que puede contener ecos del prompt inicial
-            # if not is_first_iteration:
-            #     logging_manager.log_debug(f"Respuesta Modelo Raw (Iteración {'Inicial' if is_first_iteration else 'Interna'})", model_response_raw) # Comentado para evitar logs del prompt
+            if is_first_iteration:
+                model_response_raw = conversation.predict(input=current_input)
+                #logging_manager.log_debug(f"Respuesta Modelo Raw (Iteración Inicial)", model_response_raw)
+            else:
+                history = memory.load_memory_variables({})['history']
+                model_response_raw = conversation.predict(input=f"{user_query}\nHistorial de la conversación:\n{history}")
 
-            # Procesar respuesta (adaptado para nuevos labels)
+            #if is_first_iteration:
+            #    logging_manager.log_debug(f"Respuesta Modelo Raw (Iteración Inicial)", model_response_raw)
+            #else:
+            #    logging_manager.log_debug(f"Respuesta Modelo Raw (Iteración Interna)", model_response_raw)
+
             label, content = communication.parse_message(model_response_raw)
 
             if not label:
@@ -99,7 +104,9 @@ def main():
             elif label == "respuesta_usuario":
                 # Si el modelo dio una respuesta directa al usuario, la tarea terminó para esta consulta.
                 logging_manager.log_debug("Respuesta Usuario Final", model_response_raw)
-                print(model_response_raw)
+                # Extraer el contenido del mensaje
+                _, content = communication.parse_message(model_response_raw)
+                print(content)
                 # Langchain ya guardó la respuesta final en memoria con predict
                 break # Salir del bucle interno, volver a esperar input del usuario externo
 

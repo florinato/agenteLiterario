@@ -1,17 +1,43 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import ReactSimpleMDE from 'react-simplemde-editor';
-import "simplemde/dist/simplemde.min.css"; // Import the CSS
+import SimpleMDE from 'easymde';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import "simplemde/dist/simplemde.min.css";
 
 function EditorCanvas({ filePath, content, onSave }) {
-  const [value, setValue] = useState(''); // Initialize state without content
-  // Use useEffect to update the value when the content prop changes
-  useEffect(() => {
-    setValue(content || '');
-  }, [content]);
+  const [value, setValue] = useState(content || '');
+  const editorRef = useRef(null);
+  const simpleMDERef = useRef(null);
 
-  const handleChange = (newValue) => {
-    setValue(newValue);
-  };
+  useEffect(() => {
+    // Initialize editor
+    simpleMDERef.current = new SimpleMDE({
+      element: editorRef.current,
+      initialValue: value,
+      autofocus: false,
+      spellChecker: false,
+      forceSync: true
+    });
+
+    // Handle changes
+    simpleMDERef.current.codemirror.on('change', () => {
+      const newValue = simpleMDERef.current.value();
+      setValue(newValue);
+    });
+
+    return () => {
+      // Cleanup
+      if (simpleMDERef.current) {
+        simpleMDERef.current.toTextArea();
+        simpleMDERef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // Update editor when content prop changes
+    if (simpleMDERef.current && simpleMDERef.current.value() !== content) {
+      simpleMDERef.current.value(content || '');
+    }
+  }, [content]);
 
   const handleSave = useCallback(() => {
     if (onSave) {
@@ -19,19 +45,9 @@ function EditorCanvas({ filePath, content, onSave }) {
     }
   }, [filePath, value, onSave]);
 
-  const options = {
-    autofocus: false,
-    spellChecker: false,
-    // Add more SimpleMDE options here as needed
-  };
-
   return (
     <div className="editor-canvas">
-      <ReactSimpleMDE
-        value={value}
-        onChange={handleChange}
-        options={options}
-      />
+      <textarea ref={editorRef} />
       <button onClick={handleSave} style={{ marginTop: '10px' }}>Save</button>
     </div>
   );

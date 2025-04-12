@@ -1,11 +1,3 @@
-# Base dependencies (assuming these are needed, adjust if necessary)
-langchain
+langchain==0.3.23
 google-generativeai
-python-dotenv
-
-# API dependencies (Removed for Agente Literario)
-# fastapi
-# uvicorn[standard]
-
-# Database dependencies (Removed for Agente Literario)
-# pymongo
+python-dotenv==1.1.0

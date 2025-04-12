@@ -1,206 +1,106 @@
-# executor.py
 import os
-import subprocess
-from os import getcwd
-
-import logging_manager
-
-# No fixed target directory anymore. Commands run in the project's root directory by default.
-
-def execute_action(label: str, content: str) -> str:
-    """
-    Executes the action based on the label. Currently only handles 'execute_command'.
-    Runs the command directly in PowerShell from the project's root directory.
-    """
-    if label == "execute_command":
-        # Treat content directly as the PowerShell command, just strip whitespace
-        command_to_execute = content.strip()
-        try:
-            logging_manager.log_debug("Executor", f"Intentando ejecutar comando: {command_to_execute}")
-            # Execute the command explicitly using PowerShell from the current working directory
-            # We pass the command string to PowerShell's -Command argument.
-            # shell=False is generally safer when we control the executable.
-            powershell_executable = "C:\\Program Files\\PowerShell\\7\\pwsh.exe" # Assumes PowerShell 7+ is in PATH
-            try:
-                # Capture raw bytes, do not decode automatically
-                result = subprocess.run(
-                    [powershell_executable, "-Command", command_to_execute],
-                    capture_output=True,    # Capture stdout/stderr as bytes
-                    # cwd=TARGET_DIR, # Removed: Execute in the current working directory of the script
-                    shell=False             # Do not use the default shell
-                )
-                logging_manager.log_debug("Executor", f"Comando ejecutado. Código de retorno: {result.returncode}")
-            except FileNotFoundError:
-                # Fallback to older powershell.exe if pwsh.exe is not found
-                powershell_executable = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
-                logging_manager.log_debug("Executor Info", "pwsh.exe not found, trying powershell.exe")
-                try:
-                    result = subprocess.run(
-                        [powershell_executable, "-Command", command_to_execute],
-                        capture_output=True, # cwd=TARGET_DIR, # Removed
-                        shell=False # Capture raw bytes
-                    )
-                    logging_manager.log_debug("Executor", f"Comando ejecutado (powershell.exe). Código de retorno: {result.returncode}")
-                except FileNotFoundError:
-                    error_msg = "Error: Ni 'pwsh.exe' ni 'powershell.exe' se encontraron en el PATH. No se puede ejecutar el comando PowerShell."
-                    logging_manager.log_debug("Executor Error", error_msg)
-                    return error_msg
-
-            # --- Decode Output Bytes Robustly ---
-            output = ""
-            try:
-                # Try decoding stdout using UTF-8 first, then common Windows encodings
-                stdout_decoded = result.stdout.decode('utf-8')
-            except UnicodeDecodeError:
-                try:
-                    # Try cp1252 (Windows Latin 1)
-                    stdout_decoded = result.stdout.decode('cp1252', errors='replace')
-                    logging_manager.log_debug("Executor Info", "Decoded stdout using cp1252")
-                except Exception:
-                     # Fallback: decode with replacement if other encodings fail
-                     stdout_decoded = result.stdout.decode('utf-8', errors='replace')
-                     logging_manager.log_debug("Executor Warning", "Could not reliably decode stdout, used UTF-8 with replacement.")
-
-            try:
-                 # Try decoding stderr using UTF-8 first, then common Windows encodings
-                stderr_decoded = result.stderr.decode('utf-8')
-            except UnicodeDecodeError:
-                try:
-                    # Try cp1252
-                    stderr_decoded = result.stderr.decode('cp1252', errors='replace')
-                    logging_manager.log_debug("Executor Info", "Decoded stderr using cp1252")
-                except Exception:
-                    # Fallback
-                    stderr_decoded = result.stderr.decode('utf-8', errors='replace')
-                    logging_manager.log_debug("Executor Warning", "Could not reliably decode stderr, used UTF-8 with replacement.")
-
-            # Combine decoded stdout and stderr
-            if stdout_decoded:
-                output += f"Salida:\\n{stdout_decoded.strip()}\\n"
-            if stderr_decoded:
-                output += f"Errores:\\n{stderr_decoded.strip()}\\n"
-
-            if not output.strip(): # Check if output is truly empty after decoding
-                # Distinguish between successful execution with no output vs actual errors
-                if result.returncode == 0:
-                    output = "Comando ejecutado con éxito (sin salida)."
-                else:
-                    # If there was an error code but no stderr message, provide a generic error
-                    output = f"Comando falló con código de retorno {result.returncode} (sin salida de error específica)."
-
-            return output.strip()
-
-        except FileNotFoundError as e:
-            error_msg = f"Error: Comando no encontrado o ruta inválida: '{command_to_execute}'. Detalles: {e}"
-            logging_manager.log_error("Executor Error", error_msg)
-            return error_msg
-        except Exception as e:
-            error_msg = f"Error inesperado ejecutando comando: {e}. Tipo: {type(e).__name__}"
-            logging_manager.log_error("Executor Error", error_msg)
-            return error_msg
-# executor.py
-import os
+import shutil
 import subprocess
 
+import communication
 import logging_manager
 
-# No fixed target directory anymore. Commands run in the project's root directory by default.
+HISTORIAS_DIR = r"C:\Users\oscar\Desktop\proyectospy\agenteLiterario\historias"
 
-def execute_action(label: str, content: str) -> str:
-    """
-    Executes the action based on the label. Currently only handles 'execute_command'.
-    Runs the command directly in PowerShell from the project's root directory.
-    """
-    if label == "execute_command":
-        # Treat content directly as the PowerShell command, just strip whitespace
-        command_to_execute = content.strip()
-        try:
-            # Execute the command explicitly using PowerShell from the current working directory
-            # We pass the command string to PowerShell's -Command argument.
-            # shell=False is generally safer when we control the executable.
-            powershell_executable = "C:\\Program Files\\PowerShell\\7\\pwsh.exe" # Assumes PowerShell 7+ is in PATH
-            try:
-                # Capture raw bytes, do not decode automatically
-                result = subprocess.run(
-                    [powershell_executable, "-Command", command_to_execute],
-                    capture_output=True,    # Capture stdout/stderr as bytes
-                    # cwd=TARGET_DIR, # Removed: Execute in the current working directory of the script
-                    shell=False             # Do not use the default shell
-                )
-            except FileNotFoundError:
-                # Fallback to older powershell.exe if pwsh.exe is not found
-                powershell_executable = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
-                logging_manager.log_debug("Executor Info", "pwsh.exe not found, trying powershell.exe")
-                try:
-                    result = subprocess.run(
-                        [powershell_executable, "-Command", command_to_execute],
-                        capture_output=True, # cwd=TARGET_DIR, # Removed
-                        shell=False # Capture raw bytes
-                    )
-                except FileNotFoundError:
-                    error_msg = "Error: Ni 'pwsh.exe' ni 'powershell.exe' se encontraron en el PATH. No se puede ejecutar el comando PowerShell."
-                    logging_manager.log_debug("Executor Error", error_msg)
-                    return error_msg
-
-            # --- Decode Output Bytes Robustly ---
-            output = ""
-            try:
-                # Try decoding stdout using UTF-8 first, then common Windows encodings
-                stdout_decoded = result.stdout.decode('utf-8')
-            except UnicodeDecodeError:
-                try:
-                    # Try cp1252 (Windows Latin 1)
-                    stdout_decoded = result.stdout.decode('cp1252', errors='replace')
-                    logging_manager.log_debug("Executor Info", "Decoded stdout using cp1252")
-                except Exception:
-                     # Fallback: decode with replacement if other encodings fail
-                     stdout_decoded = result.stdout.decode('utf-8', errors='replace')
-                     logging_manager.log_debug("Executor Warning", "Could not reliably decode stdout, used UTF-8 with replacement.")
-
-            try:
-                 # Try decoding stderr using UTF-8 first, then common Windows encodings
-                stderr_decoded = result.stderr.decode('utf-8')
-            except UnicodeDecodeError:
-                try:
-                    # Try cp1252
-                    stderr_decoded = result.stderr.decode('cp1252', errors='replace')
-                    logging_manager.log_debug("Executor Info", "Decoded stderr using cp1252")
-                except Exception:
-                    # Fallback
-                    stderr_decoded = result.stderr.decode('utf-8', errors='replace')
-                    logging_manager.log_debug("Executor Warning", "Could not reliably decode stderr, used UTF-8 with replacement.")
-
-            # Combine decoded stdout and stderr
-            if stdout_decoded:
-                output += f"Salida:\\n{stdout_decoded.strip()}\\n"
-            
-
-            if not output.strip(): # Check if output is truly empty after decoding
-                # Distinguish between successful execution with no output vs actual errors
-                if result.returncode == 0:
-                    output = "Comando ejecutado con éxito (sin salida)."
-                else:
-                    # If there was an error code but no stderr message, provide a generic error
-                    output = f"Comando falló con código de retorno {result.returncode} (sin salida de error específica)."
-
-            return output.strip()
-
-        except FileNotFoundError as e:
-            error_msg = f"Error: Comando no encontrado o ruta inválida: '{command_to_execute}'. Detalles: {e}"
-            logging_manager.log_debug("Executor Error", error_msg)
-            return error_msg
-        except Exception as e:
-            error_msg = f"Error inesperado ejecutando comando: {e}"
-            logging_manager.log_debug("Executor Error", error_msg)
-            return error_msg
-
-    # Handle tool_call or other labels if they were re-introduced,
-    # but based on the plan, we only expect execute_command now.
-    # elif label == "tool_call":
-    #     return "Error: La ejecución de 'tool_call' ha sido eliminada de este executor."
-
+def handle_command(command):
+    logging_manager.logging.debug("Executor - handle_command", "Comando recibido: {}".format(command))
+    if command.startswith("leer"):
+        return leer_historia(command)
+    elif command.startswith("listar"):
+        return listar_directorio(command)
+    elif command.startswith("arbol"):
+        #return mostrar_arbol(command)
+        return "❌ Comando 'arbol' no implementado en este archivo. Por favor, utiliza model_integration.py"
+    elif command.startswith("buscar"):
+        return buscar_en_archivo(command)
     else:
-        # Should not be reached if main.py calls correctly
-        error_msg = f"Error interno del Executor: Etiqueta desconocida '{label}'."
-        logging_manager.log_debug("Executor Error", error_msg)
-        return error_msg
+        return "❌ Comando no reconocido"
+
+def leer_historia(command):
+    logging_manager.logging.debug("Executor - leer_historia", "Comando recibido: {}".format(command))
+    try:
+        partes = command.split(" ", 1)
+        if len(partes) < 1:
+            return "❌ Comando 'leer' incompleto. Debe especificar la ruta del archivo."
+        _, ruta = partes
+        ruta_abs = os.path.join(HISTORIAS_DIR, ruta.strip())
+        if os.access(ruta_abs, os.R_OK):
+            with open(ruta_abs, "r", encoding="utf-8") as f:
+                return f.read()
+        else:
+            return f"❌ No tiene permisos de lectura en: {ruta_abs}"
+    except Exception as e:
+        return f"❌ Error al leer la historia: {e}"
+
+def listar_directorio(command):
+    logging_manager.logging.debug("Executor - listar_directorio", "Comando recibido: {}".format(command))
+    try:
+        partes = command.split(" ", 1)
+        if len(partes) < 1:
+            return "❌ Comando 'listar' incompleto. Debe especificar la ruta del directorio."
+        _, ruta = partes
+        ruta_abs = os.path.join(HISTORIAS_DIR, ruta.strip())
+        if os.path.isdir(ruta_abs) and os.access(ruta_abs, os.R_OK):
+            archivos = os.listdir(ruta_abs)
+            logging_manager.logging.debug("Executor - listar_directorio", "Archivos encontrados: {}".format(archivos)) # Add logging
+            return "\\n".join(archivos)
+        else:
+            return f"❌ No es un directorio o no tiene permisos de lectura en: {ruta_abs}"
+    except Exception as e:
+        return f"❌ Error al listar el directorio: {e}"
+
+#def mostrar_arbol(command):
+#    logging_manager.logging.debug("Executor - mostrar_arbol", f"Comando recibido: {command}")
+#    try:
+#        partes = command.split(" ", 2)
+#        if len(partes) < 2:
+#            ruta_abs = HISTORIAS_DIR
+#        else:
+#            _, ruta = partes
+#            ruta_abs = os.path.join(HISTORIAS_DIR, ruta.strip())
+#        if os.path.isdir(ruta_abs) and os.access(ruta_abs, os.R_OK):
+#            # powershell_executable = shutil.which("powershell") or shutil.which("pwsh")
+#            # if not powershell_executable:
+#            #     return "❌ PowerShell no encontrado"
+#            result = subprocess.run(
+#                ["tree", "/F", ruta_abs],
+#                capture_output=True, text=True, encoding="utf-8",
+#                errors="replace"
+#            )
+#            return result.stdout
+#        else:
+#            return f"❌ No es un directorio o no tiene permisos de lectura en: {ruta_abs}"
+#    except Exception as e:
+#        return f"❌ Error al mostrar el árbol: {e}"
+
+def buscar_en_archivo(command):
+    logging_manager.logging.debug("Executor - buscar_en_archivo", "Comando recibido: {}".format(command))
+    try:
+        partes = command.split(" ", 2)
+        if len(partes) < 2:
+            return "❌ Comando 'buscar' incompleto. Debe especificar la ruta del archivo y el texto a buscar."
+        _, ruta = partes
+        ruta_abs = os.path.join(HISTORIAS_DIR, ruta.strip())
+        #texto = texto.strip('"')
+        texto = partes[1].strip('"')
+        if os.access(ruta_abs, os.R_OK):
+            try:
+                with open(ruta_abs, "r", encoding="utf-8") as f:
+                    contenido = f.read()
+                    if texto in contenido:
+                        return f"✅ Se encontró '{{texto}}' en {ruta_abs}"
+                    else:
+                        return f"❌ No se encontró '{{texto}}' en {ruta_abs}"
+            except Exception as e:
+                return f"❌ Error al buscar en el archivo: {e}"
+        else:
+            return f"❌ No tiene permisos de lectura en: {ruta_abs}"
+    except Exception as e:
+        return f"❌ Error al procesar la búsqueda: {e}"
+
+import communication

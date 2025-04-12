@@ -88,4 +88,85 @@ async def read_file(path: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading file {path}: {e}")
 
-# TODO: Add endpoints for /save, /create
+class SaveFileRequest(BaseModel):
+    path: str
+    content: str
+
+@router.post("/save")
+async def save_file(file_data: SaveFileRequest):
+    """Saves the content to a specific file within the 'historias' directory."""
+    if not file_data.path:
+        raise HTTPException(status_code=400, detail="File path parameter is required.")
+
+    # Basic security check: ensure path doesn't try to escape HISTORIAS_DIR
+    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, file_data.path))
+    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+        raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
+
+    try:
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        with open(target_path, 'w', encoding='utf-8') as f:
+            f.write(file_data.content)
+        return {"message": f"File saved successfully to {file_data.path}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error saving file {file_data.path}: {e}")
+
+class RenameFileRequest(BaseModel):
+    oldPath: str
+    newPath: str
+
+@router.post("/rename")
+async def rename_file(rename_data: RenameFileRequest):
+    """Renames a file or directory within the 'historias' directory."""
+    if not rename_data.oldPath or not rename_data.newPath:
+        raise HTTPException(status_code=400, detail="Old and new file paths are required.")
+
+    old_path = os.path.abspath(os.path.join(HISTORIAS_DIR, rename_data.oldPath))
+    new_path = os.path.abspath(os.path.join(HISTORIAS_DIR, rename_data.newPath))
+
+    # Security checks to prevent path traversal
+    if not old_path.startswith(os.path.abspath(HISTORIAS_DIR)) or \
+       not new_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+        raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
+
+    if not os.path.exists(old_path):
+        raise HTTPException(status_code=404, detail=f"File not found: {rename_data.oldPath}")
+
+    try:
+        os.rename(old_path, new_path)
+        return {"message": f"Renamed '{rename_data.oldPath}' to '{rename_data.newPath}'"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error renaming file: {e}")
+
+class DeleteFileRequest(BaseModel):
+    path: str
+
+@router.delete("/delete")
+async def delete_file(path: str):
+    """Deletes a file or directory within the 'historias' directory."""
+    if not path:
+        raise HTTPException(status_code=400, detail="File path parameter is required.")
+
+    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, path))
+
+    # Security checks to prevent path traversal
+    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+        raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
+
+    if not os.path.exists(target_path):
+        raise HTTPException(status_code=404, detail=f"File not found: {path}")
+
+    try:
+        if os.path.isfile(target_path):
+            os.remove(target_path)
+        elif os.path.isdir(target_path):
+            os.rmdir(target_path)  # For now, only allow deleting empty directories
+        else:
+            raise HTTPException(status_code=400, detail=f"Path is not a file or directory: {path}")
+
+        return {"message": f"Deleted '{path}'"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting file: {e}")
+
+# TODO: Add endpoints for /create

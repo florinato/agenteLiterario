@@ -8,14 +8,23 @@ Este es un proyecto de Agente Literario.
 
 ## Instalación
 
-Para instalar y ejecutar este proyecto, siga estos pasos:
+### Backend
 
-1.  Clone el repositorio: `git clone https://github.com/florinato/agenteLiterario/tree/editor-agent`
-2.  Navegue al directorio del proyecto: `cd agenteLiterario`
-3.  Cree un entorno virtual: `python3 -m venv venv`
-4.  Active el entorno virtual: `source venv/bin/activate` (Linux/macOS) o `venv\Scripts\activate` (Windows)
-5.  Instale las dependencias: `pip install -r requirements.txt`
-6.  Ejecute la aplicación: `python run.py`
+Para instalar y ejecutar el backend de este proyecto, siga estos pasos:
+
+1.  Navegue al directorio del backend: `cd agente_literario_ui/backend`
+2.  Cree un entorno virtual: `python3 -m venv venv`
+3.  Active el entorno virtual: `source venv/bin/activate` (Linux/macOS) o `venv\Scripts\activate` (Windows)
+4.  Instale las dependencias: `pip install -r requirements.txt`
+5.  Ejecute la aplicación: `python main.py`
+
+### Frontend
+
+Para instalar y ejecutar el frontend de este proyecto, siga estos pasos:
+
+1.  Navegue al directorio del frontend: `cd agente_literario_ui/frontend`
+2.  Instale las dependencias: `npm install`
+3.  Ejecute la aplicación: `npm run dev`
 
 ¡Disfrute de su Agente Literario!
 
@@ -25,7 +34,12 @@ Este proyecto está diseñado para utilizar la API de Gemini. Para su correcto f
 Alternativamente, puede adaptar el proyecto para que funcione con Ollama u otro modelo de lenguaje de su elección.
 
 El modelo ejecuta comandos en Powershel para hacer las operaciones, pero aún no se ha implementado el módulo de seguridad.
-Alternativamente, puede puede usar docker o sandbox para ejecutar el proyecto.
+
+**Precauciones de seguridad:**
+
+*   **No exponga su API key de Gemini a terceros.**
+*   **Considere ejecutar el proyecto en un entorno aislado (Docker, Sandbox) para evitar posibles riesgos de seguridad.**
+*   **Revise y comprenda el código antes de ejecutarlo.**
 
 ## Descripción del Proyecto
 
@@ -49,3 +63,7 @@ Si desea contribuir a este proyecto, siga estos pasos:
 1.  **Cree una bifurcación (fork) del repositorio:** Esto crea una copia del repositorio en su propia cuenta de GitHub.
 2.  **Realice los cambios deseados en su bifurcación:** Modifique el código, añada nuevas características o corrija errores.
 3.  **Envíe una solicitud de extracción (pull request):** Proponga sus cambios para que sean incorporados al repositorio principal.
+
+## Próximos Pasos
+
+El siguiente paso es que el agente edite directamente en el canvas para una experiencia de usuario más interactiva.

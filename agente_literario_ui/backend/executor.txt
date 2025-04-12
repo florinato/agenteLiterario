@@ -1,0 +1,1 @@
+leer_historia: ❌ Error al leer la historia: too many values to unpack (expected 2)\nlistar_directorio: ❌ Error al listar el directorio: too many values to unpack (expected 2)\nmostrar_arbol: ❌ Error al mostrar el árbol: too many values to unpack (expected 2)\nbuscar_en_archivo: ❌ Error al procesar la búsqueda: too many values to unpack (expected 3)
