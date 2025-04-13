@@ -169,4 +169,30 @@ async def delete_file(path: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting file: {e}")
 
-# TODO: Add endpoints for /create
+class CreateFileRequest(BaseModel):
+    path: str
+    content: str = ""
+
+@router.post("/create")
+async def create_file(file_data: CreateFileRequest):
+    """Creates a new file within the 'historias' directory."""
+    if not file_data.path:
+        raise HTTPException(status_code=400, detail="File path parameter is required.")
+
+    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, file_data.path))
+
+    # Security checks to prevent path traversal
+    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+        raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
+
+    if os.path.exists(target_path):
+        raise HTTPException(status_code=400, detail=f"File already exists: {file_data.path}")
+
+    try:
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        with open(target_path, 'w', encoding='utf-8') as f:
+            f.write(file_data.content)
+        return {"message": f"File created successfully at {file_data.path}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating file {file_data.path}: {e}")
