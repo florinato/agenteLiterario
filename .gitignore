@@ -1,6 +1,6 @@
-.qodo
+*.qodo
 .env
 /venv
 __pycache__/
 *.log
-
+historias/ReGenesis/

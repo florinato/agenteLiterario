@@ -85,11 +85,18 @@ function App() {
       setConversation([]);
     } finally {
       setIsAgentLoading(false);
+      setPromptInput('');
     }
   }, [promptInput, selectedFilePath]);
 
   const handleInputChange = (event) => {
     setPromptInput(event.target.value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleAgentPrompt();
+    }
   };
 
   return (
@@ -132,12 +139,12 @@ function App() {
                   </div>
                 ))}
                 <div className="prompt-placeholder">
-                  <input
-                    type="text"
+                  <textarea
                     placeholder="Enter prompt for agent..."
                     value={promptInput}
                     onChange={handleInputChange}
                     ref={promptInputRef}
+                    onKeyDown={handleKeyDown}
                   />
                   <button onClick={handleAgentPrompt}>Send</button>
                 </div>
