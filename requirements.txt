@@ -1,3 +1,0 @@
-langchain==0.3.23
-google-generativeai
-python-dotenv==1.1.0
