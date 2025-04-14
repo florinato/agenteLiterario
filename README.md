@@ -49,7 +49,7 @@ Agente Literario es un agente conversacional autónomo diseñado para ayudarte a
 *   Generación de historias interactivas: Agente Literario te guía a través del proceso de creación de historias, ofreciéndote sugerencias, ideas y opciones para desarrollar tu trama.
 *   Adaptabilidad a diferentes géneros: Ya sea que te interese la ciencia ficción, la fantasía, el romance o el misterio, Agente Literario se adapta a tus preferencias y te ayuda a crear historias en el género que desees.
 *   Herramientas de edición y revisión: Agente Literario te proporciona herramientas para editar y revisar tu historia, asegurando que tu narrativa sea coherente, atractiva y bien escrita.
-*   Integración con herramientas externas:** Agente Literario se integra con herramientas externas, como bases de datos de personajes, generadores de nombres y correctores gramaticales, para enriquecer tu proceso de creación de historias.
+*   Integración con herramientas externas:** Agente Literario se puede integrar con herramientas externas, como bases de datos de personajes, generadores de nombres y correctores gramaticales, para enriquecer tu proceso de creación de historias.
 *   Gestión de personajes: Facilita la creación y el seguimiento de personajes a lo largo de la historia.
 *   Creación de escenarios: Permite diseñar y describir escenarios detallados para ambientar las historias.
 *   Sugerencia de ideas: Ofrece sugerencias para expandir y mejorar las historias.
