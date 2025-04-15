@@ -4,7 +4,7 @@ Este es un proyecto de Agente Literario.
 
 ## Captura de Pantalla
 
-![Captura de pantalla](Captura%20de%20pantalla%202025-04-08%20201807.png)
+![Captura de pantalla](Captura%20de%20pantalla%202025-04-15%20113858.png)
 
 ## Instalación
 
