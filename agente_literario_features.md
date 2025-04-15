@@ -28,14 +28,8 @@ El agente combinará la asistencia creativa con la gestión práctica del proyec
     *   **Análisis de Coherencia (`analizar_coherencia`):** Utilizar las capacidades de lectura y búsqueda para identificar posibles inconsistencias en la trama, personajes o cronología entre diferentes archivos o secciones.
     *   **Sugerencias Básicas (`sugerir_ideas`):** Ofrecer ayuda inicial para superar bloqueos creativos, generar ideas simples o desarrollar descripciones básicas, basándose en el contexto existente.
 
-## 3. Operación y Seguridad
 
-*   **Autonomía de Comandos:** El agente generará y ejecutará los comandos CLI necesarios para las tareas de gestión de archivos dentro del directorio `historias`. Se espera que el agente tenga el acceso necesario a la consola en ese contexto.
-*   **Contexto `historias`:** Todas las operaciones de gestión de archivos se realizarán por defecto dentro del directorio `historias` o sus subdirectorios.
-*   **Confirmación de Seguridad:** Las acciones que puedan ser destructivas (eliminar archivos/carpetas, sobrescribir archivos existentes con `write_to_file`) requerirán confirmación explícita del usuario antes de la ejecución.
-    *   *Mecanismo:* Uso del parámetro `requires_approval=true` en la herramienta `execute_command` o al usar `write_to_file`.
-
-## 4. Próximos Pasos (Funcionalidades Futuras)
+## 3. Próximos Pasos (Funcionalidades Futuras)
 
 *   Integración más profunda de análisis de texto (tono, ritmo, estilo).
 *   Gestión avanzada de metadatos (personajes, lugares, líneas temporales).

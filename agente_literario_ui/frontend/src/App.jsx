@@ -1,6 +1,3 @@
-// Paso 1: instala la librería con:
-// npm install react-resizable-panels
-
 import axios from 'axios';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -9,6 +6,7 @@ import {
   PanelResizeHandle,
 } from 'react-resizable-panels';
 import './App.css';
+import AppTabs from './components/AppTabs.jsx';
 import EditorCanvas from './components/EditorCanvas';
 import ErrorBoundary from './components/ErrorBoundary';
 import FileExplorer from './components/FileExplorer';
@@ -16,6 +14,8 @@ import FileExplorer from './components/FileExplorer';
 const API_BASE_URL = 'http://localhost:8000';
 
 function App() {
+  const [openTabs, setOpenTabs] = useState([]);
+  const [activeTab, setActiveTab] = useState(null);
   const [selectedFilePath, setSelectedFilePath] = useState(null);
   const [fileContent, setFileContent] = useState('');
   const [isLoadingContent, setIsLoadingContent] = useState(false);
@@ -27,7 +27,7 @@ function App() {
   const [conversation, setConversation] = useState([]);
   const promptInputRef = useRef(null);
 
-  const handleFileSelect = useCallback(async (filePath) => {
+ const handleFileSelect = useCallback(async (filePath) => {
     setSelectedFilePath(filePath);
     setIsLoadingContent(true);
     setContentError(null);
@@ -39,6 +39,16 @@ function App() {
         params: { path: filePath },
       });
       setFileContent(response.data.content);
+
+      // Update openTabs state
+      setOpenTabs((prevTabs) => {
+        const tabExists = prevTabs.some((tab) => tab.path === filePath);
+        if (!tabExists) {
+          return [...prevTabs, { path: filePath }];
+        }
+        return prevTabs;
+      });
+      setActiveTab(filePath);
     } catch (err) {
       setContentError(`Failed to load content for ${filePath}.`);
     } finally {
@@ -99,8 +109,41 @@ function App() {
     }
   };
 
+  const handleSelectTab = (path) => {
+    setActiveTab(path);
+    handleFileSelect(path);
+  };
+
+  const handleCloseTab = (path) => {
+    setOpenTabs(openTabs.filter((tab) => tab.path !== path));
+    if (activeTab === path) {
+      setActiveTab(null);
+      setSelectedFilePath(null);
+      setFileContent('');
+    }
+  };
+
+ React.useEffect(() => {
+    if (selectedFilePath) {
+      setOpenTabs((prevTabs) => {
+        const tabExists = prevTabs.some((tab) => tab.path === selectedFilePath);
+        if (!tabExists) {
+          return [...prevTabs, { path: selectedFilePath }];
+        }
+        return prevTabs;
+      });
+      setActiveTab(selectedFilePath);
+    }
+  }, [selectedFilePath]);
+
   return (
     <ErrorBoundary>
+      <AppTabs
+        openTabs={openTabs}
+        activeTab={activeTab}
+        onSelectTab={handleSelectTab}
+        onCloseTab={handleCloseTab}
+      />
       <PanelGroup direction="horizontal">
         <Panel defaultSize={20} minSize={15}>
           <div className="sidebar">

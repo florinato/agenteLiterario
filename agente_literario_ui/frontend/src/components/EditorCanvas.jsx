@@ -14,7 +14,7 @@ function EditorCanvas({ filePath, content, onSave }) {
       initialValue: value,
       autofocus: false,
       spellChecker: false,
-      forceSync: true
+      forceSync: true,
     });
 
     // Handle changes
@@ -46,7 +46,7 @@ function EditorCanvas({ filePath, content, onSave }) {
   }, [filePath, value, onSave]);
 
   return (
-    <div className="editor-canvas">
+    <div className="editor-canvas" style={{ padding: '10px' }}>
       <textarea ref={editorRef} />
       <button onClick={handleSave} style={{ marginTop: '10px' }}>Save</button>
     </div>
