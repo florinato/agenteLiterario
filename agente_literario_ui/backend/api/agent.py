@@ -84,7 +84,7 @@ Agente (responde en español):"""
 
     # --- Main Interaction Loop ---
     current_prompt = request.prompt  # Start with the user's initial prompt
-    max_iterations = 3 # Limit iterations to prevent infinite loops
+    max_iterations = 20 # Limit iterations to prevent infinite loops
     iteration = 0
     final_agent_response = None
 

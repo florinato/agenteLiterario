@@ -1,34 +1,50 @@
 import os
 import subprocess
+import sys
 
-# Directorios
-frontend_dir = "agente_literario_ui/frontend"
-backend_dir = "agente_literario_ui/backend"
+# Directorio del frontend
+frontend_dir = os.path.join("agente_literario_ui", "frontend")
+# Comando para ejecutar el frontend
+# Primero intenta con el npm local, luego con el npm global
+if os.path.exists(os.path.join(frontend_dir, "node_modules", ".bin", "npm")):
+    frontend_command = [os.path.join(frontend_dir, "node_modules", ".bin", "npm"), "run", "dev"]
+else:
+    # Si npm no se encuentra en node_modules/.bin, intenta con npm.cmd
+    # Busca npm en el PATH
+    npm_path = None
+    for path in os.environ["PATH"].split(os.pathsep):
+        npm_cmd = os.path.join(path, "npm.cmd")
+        if os.path.exists(npm_cmd):
+            npm_path = npm_cmd
+            break
+    if npm_path:
+        frontend_command = [npm_path, "run", "dev"]
+    else:
+        print("npm no encontrado en node_modules/.bin/ ni en el PATH.")
+        sys.exit(1)
 
-# Comandos
-# En Windows, la ruta a npm sería algo como "agente_literario_ui/frontend/node_modules/.bin/npm.cmd"
-# En otros sistemas, podría ser "agente_literario_ui/frontend/node_modules/.bin/npm"
-# Para hacerlo portable, intentaremos ambas opciones.
-frontend_command = ["node_modules/.bin/npm", "run", "dev"]
-backend_command = ["uvicorn", "main:app", "--reload"]
-
-# Cambiar al directorio del frontend y ejecutar el comando
-print(f"Ejecutando el frontend en {frontend_dir}...")
+print("Ejecutando el frontend en {}...".format(frontend_dir))
 try:
     frontend_process = subprocess.Popen(frontend_command, cwd=frontend_dir)
+    # frontend_process.wait() # Eliminar la espera
+
 except FileNotFoundError:
+    # Si npm.cmd no se encuentra, asume que npm está en el PATH
     print("npm no encontrado en node_modules/.bin/. Intentando con npm.cmd")
-    frontend_command = ["node_modules/.bin/npm.cmd", "run", "dev"]
+    frontend_command = ["npm", "run", "dev"]
     frontend_process = subprocess.Popen(frontend_command, cwd=frontend_dir)
+    # frontend_process.wait() # Eliminar la espera
 
+# Comando y directorio para ejecutar el backend
+backend_dir = os.path.join("agente_literario_ui", "backend")
+backend_command = ["python", "main.py"]
 
-# Cambiar al directorio del backend y ejecutar el comando
-print(f"Ejecutando el backend en {backend_dir}...")
-backend_process = subprocess.Popen(backend_command, cwd=backend_dir)
+print("Ejecutando el backend en {}...".format(backend_dir))
+try:
+    backend_process = subprocess.Popen(backend_command, cwd=backend_dir)
+    # backend_process.wait() # Eliminar la espera
+except FileNotFoundError as e:
+    print(f"Error al ejecutar el backend: {e}")
+    sys.exit(1)
 
-# Esperar a que terminen los procesos (opcional)
-# No esperamos para que se ejecuten en paralelo
-# frontend_process.wait()
-# backend_process.wait()
-
-print("Frontend y backend finalizados.")
+print("Frontend y backend ejecutándose en terminales separadas.")

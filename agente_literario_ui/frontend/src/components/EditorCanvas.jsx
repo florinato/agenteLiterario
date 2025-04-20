@@ -4,6 +4,7 @@ import "simplemde/dist/simplemde.min.css";
 
 function EditorCanvas({ filePath, content, onSave }) {
   const [value, setValue] = useState(content || '');
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const editorRef = useRef(null);
   const simpleMDERef = useRef(null);
 
@@ -15,13 +16,15 @@ function EditorCanvas({ filePath, content, onSave }) {
       autofocus: false,
       spellChecker: false,
       forceSync: true,
+      styleSelectedText: false,
     });
 
-    // Handle changes
-    simpleMDERef.current.codemirror.on('change', () => {
-      const newValue = simpleMDERef.current.value();
-      setValue(newValue);
-    });
+    const cm = simpleMDERef.current.codemirror;
+    if (!isDarkMode) {
+      cm.setOption("theme", "default");
+    } else {
+      cm.setOption("theme", "material");
+    }
 
     return () => {
       // Cleanup
@@ -31,6 +34,23 @@ function EditorCanvas({ filePath, content, onSave }) {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const cm = simpleMDERef.current.codemirror;
+    if (!isDarkMode) {
+      cm.setOption("theme", "default");
+      cm.getWrapperElement().style.backgroundColor = "#fff";
+      cm.getScrollerElement().style.backgroundColor = "#fff";
+      cm.getScrollerElement().style.color = "#000";
+      document.body.classList.add('light-mode');
+    } else {
+      cm.setOption("theme", "material");
+      cm.getWrapperElement().style.backgroundColor = "#333";
+      cm.getScrollerElement().style.backgroundColor = "#333";
+      cm.getScrollerElement().style.color = "#fff";
+      document.body.classList.remove('light-mode');
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     // Update editor when content prop changes
@@ -45,10 +65,35 @@ function EditorCanvas({ filePath, content, onSave }) {
     }
   }, [filePath, value, onSave]);
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    const cm = simpleMDERef.current.codemirror;
+    if (!isDarkMode) {
+      cm.setOption("theme", "material");
+      cm.getWrapperElement().style.backgroundColor = "#333";
+      cm.getScrollerElement().style.backgroundColor = "#333";
+      cm.getScrollerElement().style.color = "#fff";
+      document.body.classList.remove('light-mode');
+    } else {
+      cm.setOption("theme", "default");
+      cm.getWrapperElement().style.backgroundColor = "#fff";
+      cm.getScrollerElement().style.backgroundColor = "#fff";
+      cm.getScrollerElement().style.color = "#000";
+      document.body.classList.add('light-mode');
+    }
+  };
+
   return (
-    <div className="editor-canvas" style={{ padding: '10px' }}>
-      <textarea ref={editorRef} />
+    <div className="editor-canvas" style={{ 
+      padding: '10px',
+      backgroundColor: 'var(--bg-color)',
+      color: 'var(--text-color)'
+    }}>
+      <textarea ref={editorRef} style={{backgroundColor: 'var(--bg-color)', color: 'var(--text-color)'}}/>
       <button onClick={handleSave} style={{ marginTop: '10px' }}>Save</button>
+      <button onClick={toggleDarkMode} style={{ marginTop: '10px' }}>
+        {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+      </button>
     </div>
   );
 }

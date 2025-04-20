@@ -110,8 +110,9 @@ function FileExplorer({ onFileSelect }) {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '0.5rem',
-          borderBottom: '1px solid #eee',
+          borderBottom: '1px solid #555',
           cursor: 'pointer',
+          color: 'var(--text-color)',
         }}
       >
         <span>
@@ -126,9 +127,9 @@ function FileExplorer({ onFileSelect }) {
           <div>
             <button
               style={{
-                background: 'none',
+                background: '#555',
                 border: 'none',
-                color: 'blue',
+                color: 'var(--text-color)',
                 cursor: 'pointer',
                 fontSize: '1rem',
                 marginRight: '0.5rem',
@@ -144,9 +145,9 @@ function FileExplorer({ onFileSelect }) {
             </button>
             <button
               style={{
-                background: 'none',
+                background: '#555',
                 border: 'none',
-                color: 'red',
+                color: 'var(--text-color)',
                 cursor: 'pointer',
                 fontSize: '1rem',
                 padding: '0.25rem',
@@ -166,20 +167,20 @@ function FileExplorer({ onFileSelect }) {
   };
 
   return (
-    <div style={{ border: '1px solid #ccc', padding: '1rem', background: '#fafafa' }}>
+    <div style={{ border: '1px solid #555', padding: '1rem', background: 'var(--sidebar-bg-color)', color: 'var(--text-color)' }}>
       <h3>📚 Explorador de archivos {currentPath && `/ ${currentPath}`}</h3>
 
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-        <button title="Crear archivo" onClick={() => handleCreate('file')} style={{ padding: '0.5rem 1rem' }}>
+        <button title="Crear archivo" onClick={() => handleCreate('file')} style={{ padding: '0.5rem 1rem', background: '#555', color: 'var(--text-color)', border: 'none' }}>
           ➕
         </button>
-        <button title="Crear carpeta" onClick={() => handleCreate('directory')} style={{ padding: '0.5rem 1rem' }}>
+        <button title="Crear carpeta" onClick={() => handleCreate('directory')} style={{ padding: '0.5rem 1rem', background: '#555', color: 'var(--text-color)', border: 'none' }}>
           📂
         </button>
       </div>
 
-      {loading && <p>⏳ Cargando archivos...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {loading && <p style={{color: 'var(--text-color)'}}>⏳ Cargando archivos...</p>}
+      {error && <p style={{ color: 'var(--text-color)' }}>{error}</p>}
       {!loading && !error && <ul style={{ listStyle: 'none', padding: 0 }}>{renderItems(items)}</ul>}
     </div>
   );

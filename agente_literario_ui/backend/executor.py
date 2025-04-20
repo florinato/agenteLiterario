@@ -54,29 +54,7 @@ def listar_directorio(command):
     except Exception as e:
         return f"❌ Error al listar el directorio: {e}"
 
-#def mostrar_arbol(command):
-#    logging_manager.logging.debug("Executor - mostrar_arbol", f"Comando recibido: {command}")
-#    try:
-#        partes = command.split(" ", 2)
-#        if len(partes) < 2:
-#            ruta_abs = HISTORIAS_DIR
-#        else:
-#            _, ruta = partes
-#            ruta_abs = os.path.join(HISTORIAS_DIR, ruta.strip())
-#        if os.path.isdir(ruta_abs) and os.access(ruta_abs, os.R_OK):
-#            # powershell_executable = shutil.which("powershell") or shutil.which("pwsh")
-#            # if not powershell_executable:
-#            #     return "❌ PowerShell no encontrado"
-#            result = subprocess.run(
-#                ["tree", "/F", ruta_abs],
-#                capture_output=True, text=True, encoding="utf-8",
-#                errors="replace"
-#            )
-#            return result.stdout
-#        else:
-#            return f"❌ No es un directorio o no tiene permisos de lectura en: {ruta_abs}"
-#    except Exception as e:
-#        return f"❌ Error al mostrar el árbol: {e}"
+
 
 def buscar_en_archivo(command):
     logging_manager.logging.debug("Executor - buscar_en_archivo", "Comando recibido: {}".format(command))

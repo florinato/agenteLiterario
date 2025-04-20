@@ -92,7 +92,7 @@ class GeminiLLM(LLM):
         headers = {"Content-Type": "application/json"}
         data = {
             "contents": [{"parts": [{"text": prompt}]}], # Send the full prompt as received
-            "generationConfig": {"maxOutputTokens": 512}
+            "generationConfig": {"maxOutputTokens": 2048}
         }
         params = {"key": self.api_key}
 
