@@ -71,9 +71,7 @@ async def read_file(path: str):
         raise HTTPException(status_code=400, detail="File path parameter is required.")
 
     # Basic security check: ensure path doesn't try to escape HISTORIAS_DIR
-    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, path))
-    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
-        raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
+    target_path = os.path.join(HISTORIAS_DIR, path)
 
     if not os.path.exists(target_path):
         raise HTTPException(status_code=404, detail=f"File not found: {path}")
@@ -99,8 +97,8 @@ async def save_file(file_data: SaveFileRequest):
         raise HTTPException(status_code=400, detail="File path parameter is required.")
 
     # Basic security check: ensure path doesn't try to escape HISTORIAS_DIR
-    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, file_data.path))
-    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+    target_path = os.path.join(HISTORIAS_DIR, file_data.path)
+    if not target_path.startswith(HISTORIAS_DIR):
         raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
 
     try:
@@ -122,12 +120,12 @@ async def rename_file(rename_data: RenameFileRequest):
     if not rename_data.oldPath or not rename_data.newPath:
         raise HTTPException(status_code=400, detail="Old and new file paths are required.")
 
-    old_path = os.path.abspath(os.path.join(HISTORIAS_DIR, rename_data.oldPath))
-    new_path = os.path.abspath(os.path.join(HISTORIAS_DIR, rename_data.newPath))
+    old_path = os.path.join(HISTORIAS_DIR, rename_data.oldPath)
+    new_path = os.path.join(HISTORIAS_DIR, rename_data.newPath)
 
     # Security checks to prevent path traversal
-    if not old_path.startswith(os.path.abspath(HISTORIAS_DIR)) or \
-       not new_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+    if not old_path.startswith(HISTORIAS_DIR) or \
+       not new_path.startswith(HISTORIAS_DIR):
         raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
 
     if not os.path.exists(old_path):
@@ -148,10 +146,10 @@ async def delete_file(path: str):
     if not path:
         raise HTTPException(status_code=400, detail="File path parameter is required.")
 
-    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, path))
+    target_path = os.path.join(HISTORIAS_DIR, path)
 
     # Security checks to prevent path traversal
-    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+    if not target_path.startswith(HISTORIAS_DIR):
         raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
 
     if not os.path.exists(target_path):
@@ -179,10 +177,10 @@ async def create_file(file_data: CreateFileRequest):
     if not file_data.path:
         raise HTTPException(status_code=400, detail="File path parameter is required.")
 
-    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, file_data.path))
+    target_path = os.path.join(HISTORIAS_DIR, file_data.path)
 
     # Security checks to prevent path traversal
-    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+    if not target_path.startswith(HISTORIAS_DIR):
         raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
 
     if os.path.exists(target_path):
@@ -203,10 +201,10 @@ async def create_file(file_data: CreateFileRequest):
 @router.post("/create_directory")
 async def create_directory(path: str):
     """Creates a new directory within the 'historias' directory."""
-    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, path))
+    target_path = os.path.join(HISTORIAS_DIR, path)
 
     # Security checks to prevent path traversal
-    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+    if not target_path.startswith(HISTORIAS_DIR):
         raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
 
     if os.path.exists(target_path):

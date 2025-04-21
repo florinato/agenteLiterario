@@ -5,7 +5,7 @@ import subprocess
 import communication
 import logging_manager
 
-HISTORIAS_DIR = r"C:\Users\oscar\Desktop\proyectospy\agenteLiterario\historias"
+HISTORIAS_DIR = os.getenv("HISTORIAS_DIR")
 
 def handle_command(command):
     logging_manager.logging.debug("Executor - handle_command", "Comando recibido: {}".format(command))

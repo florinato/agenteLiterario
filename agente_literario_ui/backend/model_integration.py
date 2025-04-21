@@ -13,7 +13,6 @@ from langchain.llms.base import \
 # Remove ConversationChain and ConversationBufferMemory imports as they won't be used here
 
 
-load_dotenv()  # Carga las variables de entorno
 API_KEY = os.getenv("GEMINI_API_KEY")
 HISTORIAS_DIR = r"C:\Users\oscar\Desktop\proyectospy\agenteLiterario\historias" # Add absolute path back
 
