@@ -4,18 +4,12 @@ import subprocess  # Keep import if other parts use it, otherwise remove
 import sys
 
 from fastapi import APIRouter, HTTPException
-from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
-from langchain.prompts import PromptTemplate  # Import PromptTemplate
 from pydantic import BaseModel
 
 import agente_literario_ui.backend.logging_manager as logging_manager
+from agente_literario_ui.backend import model_manager
 from agente_literario_ui.backend.executor import handle_command
-from agente_literario_ui.backend.model_integration import GeminiLLM
-
-# Removed PromptTemplate import as it's not directly used here after refactor
-# from langchain.prompts import PromptTemplate
-
 
 # Add the parent directory (agenteLiterario) to the Python path
 # This allows importing modules like executor, model_integration, etc.
@@ -50,7 +44,8 @@ async def run_agent_command(request: AgentCommandRequest):
     """
     Executes an agent command based on the provided prompt, managing conversation flow.
     """
-    gemini_llm = GeminiLLM()
+    #gemini_llm = GeminiLLM()
+    model_manager_instance = model_manager.ModelManager()
 
     # Initialize ConversationChain here, using the LLM and memory
     # Note: Using the global 'conversation_memory'. This means memory persists
@@ -61,26 +56,26 @@ async def run_agent_command(request: AgentCommandRequest):
     logging_manager.logging.debug("API Agent", f"run_agent_command called with command: {cleaned_command}")
 
     # Define the explicit prompt template
-    prompt_template = PromptTemplate(
-        input_variables=["history", "input"],
-        template=gemini_llm.get_system_instructions() + """
+    #prompt_template = PromptTemplate(
+    #    input_variables=["history", "input"],
+    #    template=gemini_llm.get_system_instructions() + """
 
-Historial de Conversación:
-{history}
+    #Historial de Conversación:
+    #{history}
 
-Usuario: {input}
-Agente (responde en español):"""
-    )
+    #Usuario: {input}
+    #Agente (responde en español):"""
+    #)
 
-    conversation = ConversationChain(
-        llm=gemini_llm,
-        memory=conversation_memory, # Use the shared (but currently non-persistent) memory
-        prompt=prompt_template, # Use the custom prompt template
-        verbose=True  # Keep verbose for debugging
-    )
+    #conversation = ConversationChain(
+    #    llm=gemini_llm,
+    #    memory=conversation_memory, # Use the shared (but currently non-persistent) memory
+    #    prompt=prompt_template, # Use the custom prompt template
+    #    verbose=True  # Keep verbose for debugging
+    #)
 
     # Imprime el prompt completo antes de enviarlo al modelo
-    logging_manager.logging.debug("System Prompt + Historial", conversation.prompt.format(history=conversation_memory.load_memory_variables({})['history'], input=request.prompt))
+    #logging_manager.logging.debug("System Prompt + Historial", conversation.prompt.format(history=conversation_memory.load_memory_variables({})['history'], input=request.prompt))
 
     # --- Main Interaction Loop ---
     current_prompt = request.prompt  # Start with the user's initial prompt
@@ -92,7 +87,8 @@ Agente (responde en español):"""
         iteration += 1
         # Get response from ConversationChain
         # The chain implicitly includes history and system instructions (if configured in LLM/prompt)
-        llm_response = conversation.predict(input=current_prompt)
+        #llm_response = conversation.predict(input=current_prompt)
+        llm_response = model_manager_instance.get_response(current_prompt)
 
         # --- Process LLM Response (Search for labels anywhere) ---
         command_match = re.search(r"(?:execute_command:\s*)+([^\n]*)", llm_response, re.IGNORECASE | re.DOTALL)
@@ -109,7 +105,7 @@ Agente (responde en español):"""
                 break
         
             if cleaned_command.startswith("arbol"):
-                final_agent_response = gemini_llm._get_file_tree()
+                final_agent_response = model_manager_instance.get_file_tree()
                 break
 
             #logging_manager.logging.debug("Agent Command", "Comando original: {}\nComando limpio: {}".format(command.replace('%', '%%'), cleaned_command.replace('%', '%%')))

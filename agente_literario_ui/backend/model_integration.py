@@ -7,6 +7,8 @@ from typing import ClassVar, Dict, List, Optional, Tuple  # Add Tuple
 import logging_manager  # Importar para usar log_debug
 import requests
 from dotenv import load_dotenv
+
+load_dotenv()
 from langchain.llms.base import \
     LLM  # Keep LLM base class if needed for type hinting elsewhere
 
@@ -14,14 +16,14 @@ from langchain.llms.base import \
 
 
 API_KEY = os.getenv("GEMINI_API_KEY")
-HISTORIAS_DIR = r"C:\Users\oscar\Desktop\proyectospy\agenteLiterario\historias" # Add absolute path back
+HISTORIAS_DIR = os.getenv("HISTORIAS_DIR")
 
 
 class GeminiLLM(LLM):
     model_name: str = "gemini-2.0-flash-001"
     api_key: str = API_KEY
     # Suponemos un endpoint para la API de Gemini; ajústalo según la documentación real.
-    endpoint: str = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent"
+    endpoint: str = os.getenv("GEMINI_ENDPOINT", "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent")
 
     @property
     def _llm_type(self) -> str:
