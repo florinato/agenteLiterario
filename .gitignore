@@ -5,3 +5,5 @@ __pycache__/
 *.log
 historias/ReGenesis/
 .qodo
+agente_literario_ui/backend/testCrear.py
+testcrear

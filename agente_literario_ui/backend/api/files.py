@@ -189,10 +189,15 @@ async def create_file(file_data: CreateFileRequest):
         raise HTTPException(status_code=400, detail=f"File already exists: {file_data.path}")
 
     try:
+        if os.path.isdir(target_path):
+            raise HTTPException(status_code=400, detail=f"Directory already exists: {file_data.path}")
         # Ensure the directory exists
-        os.makedirs(os.path.dirname(target_path), exist_ok=True)
-        with open(target_path, 'w', encoding='utf-8') as f:
-            f.write(file_data.content)
+        if file_data.content == "":
+            os.makedirs(target_path, exist_ok=True)
+        else:
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+            with open(target_path, 'w', encoding='utf-8') as f:
+                f.write(file_data.content)
         return {"message": f"File created successfully at {file_data.path}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating file {file_data.path}: {e}")
