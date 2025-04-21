@@ -78,10 +78,10 @@ def log_warning(label: str):
         logging.warning(log_entry)
         last_log_message = log_entry
 
-def log_error(label: str, exc_info=False):
+def log_error(label: str, data: str, exc_info=False):
     """Agrega una entrada de error (ERROR) al archivo de log, omitiendo duplicados."""
     global last_log_message
-    log_entry = f"ERROR: [{label}]"
+    log_entry = f"ERROR: [{label}]: {data}"
     if not _is_last_log_similar(log_entry):
         logging.error(log_entry, exc_info=exc_info)
         last_log_message = log_entry

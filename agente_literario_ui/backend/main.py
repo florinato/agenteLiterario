@@ -4,29 +4,17 @@ import sys
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Add the backend directory to the Python path
+# Add necessary directories to the Python path
 backend_dir = os.path.abspath(os.path.dirname(__file__))
-if backend_dir not in sys.path:
-    sys.path.append(backend_dir)
+parent_dir = os.path.abspath(os.path.join(backend_dir, '..', '..'))
 
-# Add the parent directory (agenteLiterario) to the Python path
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-if parent_dir not in sys.path:
-    sys.path.append(parent_dir)
+for directory in [backend_dir, parent_dir]:
+    if directory not in sys.path:
+        sys.path.append(directory)
 
 import agente_literario_ui.backend.logging_manager as logging_manager
 
 logging_manager.log_debug("Backend", "Backend application started")
-
-# Add the parent directory (agenteLiterario) to the Python path
-# This allows importing modules like executor, model_integration, etc.
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-if parent_dir not in sys.path:
-    sys.path.append(parent_dir)
-
-# TODO: Import agent modules when needed
-# from executor import execute_agent_command
-# from communication import get_file_list, read_file_content, save_file_content
 
 # --- FastAPI App Setup ---
 app = FastAPI(
@@ -75,7 +63,6 @@ async def placeholder():
     # except Exception as e:
     #     raise HTTPException(status_code=500, detail=str(e))
     return {"message": "API is running. Implement specific endpoints in api/."}
-
 
 # --- Run Instructions (for development) ---
 # To run the backend server:

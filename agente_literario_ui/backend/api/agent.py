@@ -138,7 +138,7 @@ async def run_agent_command(request: AgentCommandRequest):
                 else:
                     final_agent_response = executor_response
             except Exception as exec_error:
-                logging_manager.log_error("Error executing command", f"Error executing command '{{command_to_execute}}': {{exec_error}}")
+                logging_manager.log_error("Error executing command", f"Error executing command '{cleaned_command_processed}': {exec_error}")
                 final_agent_response = f"Error al ejecutar el comando: {exec_error}"
                 break  # Exit loop on execution error
 

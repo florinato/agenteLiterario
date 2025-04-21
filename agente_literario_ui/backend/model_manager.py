@@ -3,12 +3,19 @@ from typing import Dict
 
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
+from langchain.memory.chat_message_histories import ChatMessageHistory
 from langchain.prompts import PromptTemplate
+from langchain_community.chat_message_histories import ChatMessageHistory
 
 import agente_literario_ui.backend.logging_manager as logging_manager
 from agente_literario_ui.backend.model_integration import GeminiLLM
 
-conversation_memory = ConversationBufferMemory()
+chat_history = ChatMessageHistory()
+conversation_memory = ConversationBufferMemory(
+    chat_memory=chat_history,
+    return_messages=True,
+    memory_key="history"
+)
 
 class ModelManager:
     def __init__(self):

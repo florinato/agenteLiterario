@@ -2,9 +2,11 @@
 
 Este es un proyecto de Agente Literario.
 
-## Captura de Pantalla
+## Capturas de Pantalla
 
-![Captura de pantalla](Captura%20de%20pantalla%202025-04-15%20113858.png)
+![Captura de pantalla modo claro](capturaClaro.png)
+
+![Captura de pantalla modo oscuro](CapturaOscuro.png)
 
 ## Instalación
 
