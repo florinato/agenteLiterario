@@ -52,10 +52,16 @@ function FileExplorer({ onFileSelect }) {
     const fullPath = currentPath ? `${currentPath}/${name}` : name;
 
     try {
-      await axios.post(`${API_BASE_URL}/api/files/create`, {
-        path: fullPath,
-        type,
-      });
+      if (type === 'file') {
+        await axios.post(`${API_BASE_URL}/api/files/create`, {
+          path: fullPath,
+          content: '',
+        });
+      } else {
+        await axios.post(`${API_BASE_URL}/api/files/create_directory`, {
+          path: fullPath,
+        });
+      }
       fetchFiles(currentPath);
     } catch (err) {
       alert('Error al crear el ítem.');

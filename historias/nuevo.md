@@ -1,1 +1,0 @@
-"<el contenido del contexto en memoria>"`. Sin embargo, necesito que me indiques qué información del contexto actual quieres que guarde en el archivo `nuevo.md`. Por ejemplo:

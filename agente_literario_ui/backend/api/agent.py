@@ -57,7 +57,7 @@ async def run_agent_command(request: AgentCommandRequest):
     # across calls within the same API process lifetime, but not across restarts
     # or different processes. Resetting might be needed.
     # TODO: Implement proper session-based memory management.
-    cleaned_command = None  # Initialize cleaned_command
+    cleaned_command = None
     logging_manager.logging.debug("API Agent", f"run_agent_command called with command: {cleaned_command}")
 
     # Define the explicit prompt template
@@ -95,7 +95,6 @@ Agente (responde en español):"""
         llm_response = conversation.predict(input=current_prompt)
 
         # --- Process LLM Response (Search for labels anywhere) ---
-        cleaned_command = None  # Initialize cleaned_command
         command_match = re.search(r"(?:execute_command:\s*)+([^\n]*)", llm_response, re.IGNORECASE | re.DOTALL)
 
         if command_match:
@@ -121,7 +120,17 @@ Agente (responde en español):"""
 
             # Execute the command
             try:
-                executor_response = handle_command(cleaned_command)
+                def replace_backslashes(ruta):
+                    return ruta.replace("\\", "/")
+
+                cleaned_command_processed = cleaned_command
+                if cleaned_command.startswith("leer"):
+                    partes = cleaned_command.split(" ", 1)
+                    if len(partes) > 1:
+                        _, ruta = partes
+                        ruta_procesada = replace_backslashes(ruta)
+                        cleaned_command_processed = "leer " + ruta_procesada
+                executor_response = handle_command(cleaned_command_processed)
                 #final_agent_response = executor_response
                 #executor_response = handle_command(command_to_execute)
                 # Prepare the result as the next prompt for the LLM
@@ -145,7 +154,7 @@ Agente (responde en español):"""
             else:
                  final_agent_response = llm_response # Use the raw response if no prefix
 
-            logging_manager.logging.debug("API Agent", "No command/replace found, treating as final user response.")
+            logging_manager.logging.debug("API Agent", "No command/replace found, treating as final user response. ")
             # Check if the final response still contains accidental commands (log warning)
             if "execute_command:" in final_agent_response or "replace:" in final_agent_response:
                  logging_manager.logging.warning("Command/Replace potentially missed", f"Command/Replace potentially missed in final response: {final_agent_response}")

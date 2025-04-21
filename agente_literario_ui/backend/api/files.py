@@ -4,6 +4,10 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+
+class CreateDirectoryRequest(BaseModel):
+    path: str
+
 router = APIRouter()
 
 # Define the path to the 'historias' directory relative to the main project root
@@ -198,20 +202,24 @@ async def create_file(file_data: CreateFileRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating file {file_data.path}: {e}")
 
+import urllib.parse
+
+
 @router.post("/create_directory")
-async def create_directory(path: str):
+async def create_directory(request: CreateDirectoryRequest):
     """Creates a new directory within the 'historias' directory."""
-    target_path = os.path.join(HISTORIAS_DIR, path)
+    decoded_path = urllib.parse.unquote(request.path)
+    target_path = os.path.join(HISTORIAS_DIR, decoded_path)
 
     # Security checks to prevent path traversal
     if not target_path.startswith(HISTORIAS_DIR):
         raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
 
     if os.path.exists(target_path):
-        raise HTTPException(status_code=400, detail=f"Directory already exists: {path}")
+        raise HTTPException(status_code=400, detail=f"Directory already exists: {request.path}")
 
     try:
         os.makedirs(target_path)
-        return {"message": f"Directory created successfully at {path}"}
+        return {"message": f"Directory created successfully at {request.path}"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating directory {path}: {e}")
+        raise HTTPException(status_code=500, detail=f"Error creating directory {request.path}: {e}")

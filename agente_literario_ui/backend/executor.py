@@ -7,15 +7,15 @@ import logging_manager
 
 HISTORIAS_DIR = os.getenv("HISTORIAS_DIR")
 
+def replace_backslashes(ruta):
+    return ruta.replace("\\", "/")
+
 def handle_command(command):
     logging_manager.logging.debug("Executor - handle_command", "Comando recibido: {}".format(command))
     if command.startswith("leer"):
         return leer_historia(command)
     elif command.startswith("listar"):
         return listar_directorio(command)
-    elif command.startswith("arbol"):
-        #return mostrar_arbol(command)
-        return "❌ Comando 'arbol' no implementado en este archivo. Por favor, utiliza model_integration.py"
     elif command.startswith("buscar"):
         return buscar_en_archivo(command)
     else:
@@ -28,7 +28,9 @@ def leer_historia(command):
         if len(partes) < 1:
             return "❌ Comando 'leer' incompleto. Debe especificar la ruta del archivo."
         _, ruta = partes
-        ruta_abs = os.path.join(HISTORIAS_DIR, ruta.strip())
+        ruta_procesada = replace_backslashes(ruta.strip())
+        ruta_norm = os.path.normpath(ruta_procesada)
+        ruta_abs = os.path.join(HISTORIAS_DIR, ruta_norm)
         if os.access(ruta_abs, os.R_OK):
             with open(ruta_abs, "r", encoding="utf-8") as f:
                 return f.read()

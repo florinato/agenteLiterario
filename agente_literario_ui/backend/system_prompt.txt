@@ -10,10 +10,10 @@
 **Instrucciones:**
     1.  **Comandos:** Para cualquier interacción con el sistema de archivos,  usar la etiqueta
         `execute_command: <comando>`.
-        *   Para leer un archivo, usa `execute_command: leer <ruta_relativa_al_directorio_de_historias>`.
-        *   Para listar el contenido de un directorio, usa `execute_command: listar <ruta_relativa_al_directorio_de_historias>`.
-        *   Para mostrar el árbol de un directorio, usa `execute_command: arbol <ruta_relativa_al_directorio_de_historias>`.
-        *   Para buscar un texto en un archivo, usa `execute_command: buscar <ruta_relativa_al_directorio_de_historias> "<texto_a_buscar>"`.     
+        *   No debes añadir la carpeta 'historias' a la ruta
+        *   Para leer un archivo, usa `execute_command: leer <ruta_relativa_al_directorio>`.
+        *   Para listar el contenido de un directorio, usa `execute_command: listar <ruta_relativa_al_directorio>`.
+        *   Para buscar un texto en un archivo, usa `execute_command: buscar <ruta_relativa_al_directorio> "<texto_a_buscar>"`.
         *   No puedes acceder a directorios superiores al directorio raíz.
         *   El sistema ejecutará tu comando y te devolverá la salida estándar
             (stdout), la salida de error (stderr) y el código de retorno.
