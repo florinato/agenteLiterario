@@ -189,11 +189,9 @@ async def create_file(file_data: CreateFileRequest):
         raise HTTPException(status_code=400, detail=f"File already exists: {file_data.path}")
 
     try:
-        if os.path.isdir(target_path):
-            raise HTTPException(status_code=400, detail=f"Directory already exists: {file_data.path}")
-        # Ensure the directory exists
-        if file_data.content == "":
-            os.makedirs(target_path, exist_ok=True)
+        if file_data.content == "" and not os.path.isdir(target_path):
+            # Create an empty file
+            open(target_path, 'a').close()
         else:
             os.makedirs(os.path.dirname(target_path), exist_ok=True)
             with open(target_path, 'w', encoding='utf-8') as f:
@@ -201,3 +199,21 @@ async def create_file(file_data: CreateFileRequest):
         return {"message": f"File created successfully at {file_data.path}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating file {file_data.path}: {e}")
+
+@router.post("/create_directory")
+async def create_directory(path: str):
+    """Creates a new directory within the 'historias' directory."""
+    target_path = os.path.abspath(os.path.join(HISTORIAS_DIR, path))
+
+    # Security checks to prevent path traversal
+    if not target_path.startswith(os.path.abspath(HISTORIAS_DIR)):
+        raise HTTPException(status_code=400, detail="Invalid path specified (attempted traversal).")
+
+    if os.path.exists(target_path):
+        raise HTTPException(status_code=400, detail=f"Directory already exists: {path}")
+
+    try:
+        os.makedirs(target_path)
+        return {"message": f"Directory created successfully at {path}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating directory {path}: {e}")
