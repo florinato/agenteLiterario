@@ -2,9 +2,8 @@ import SimpleMDE from 'easymde';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import "simplemde/dist/simplemde.min.css";
 
-function EditorCanvas({ filePath, content, onSave }) {
+function EditorCanvas({ filePath, content, onSave, isDarkMode, toggleDarkMode }) {
   const [value, setValue] = useState(content || '');
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const editorRef = useRef(null);
   const simpleMDERef = useRef(null);
 
@@ -37,18 +36,18 @@ function EditorCanvas({ filePath, content, onSave }) {
 
   useEffect(() => {
     const cm = simpleMDERef.current.codemirror;
-    if (!isDarkMode) {
-      cm.setOption("theme", "default");
-      cm.getWrapperElement().style.backgroundColor = "#fff";
-      cm.getScrollerElement().style.backgroundColor = "#fff";
-      cm.getScrollerElement().style.color = "#000";
-      document.body.classList.add('light-mode');
-    } else {
+    if (isDarkMode) {
       cm.setOption("theme", "material");
       cm.getWrapperElement().style.backgroundColor = "#333";
       cm.getScrollerElement().style.backgroundColor = "#333";
       cm.getScrollerElement().style.color = "#fff";
       document.body.classList.remove('light-mode');
+    } else {
+      cm.setOption("theme", "default");
+      cm.getWrapperElement().style.backgroundColor = "#fff";
+      cm.getScrollerElement().style.backgroundColor = "#fff";
+      cm.getScrollerElement().style.color = "#000";
+      document.body.classList.add('light-mode');
     }
   }, [isDarkMode]);
 
@@ -64,24 +63,6 @@ function EditorCanvas({ filePath, content, onSave }) {
       onSave(filePath, value);
     }
   }, [filePath, value, onSave]);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    const cm = simpleMDERef.current.codemirror;
-    if (!isDarkMode) {
-      cm.setOption("theme", "material");
-      cm.getWrapperElement().style.backgroundColor = "#333";
-      cm.getScrollerElement().style.backgroundColor = "#333";
-      cm.getScrollerElement().style.color = "#fff";
-      document.body.classList.remove('light-mode');
-    } else {
-      cm.setOption("theme", "default");
-      cm.getWrapperElement().style.backgroundColor = "#fff";
-      cm.getScrollerElement().style.backgroundColor = "#fff";
-      cm.getScrollerElement().style.color = "#000";
-      document.body.classList.add('light-mode');
-    }
-  };
 
   return (
     <div className="editor-canvas" style={{ 

@@ -37,12 +37,11 @@ except FileNotFoundError:
 
 # Comando y directorio para ejecutar el backend
 backend_dir = os.path.join("agente_literario_ui", "backend")
-backend_command = ["python", "main.py"]
+backend_command = ["uvicorn", "main:app", "--reload"]
 
 print("Ejecutando el backend en {}...".format(backend_dir))
 try:
-    backend_process = subprocess.Popen(backend_command, cwd=backend_dir)
-    # backend_process.wait() # Eliminar la espera
+    backend_process = subprocess.Popen(backend_command, cwd=backend_dir, shell=True)
 except FileNotFoundError as e:
     print(f"Error al ejecutar el backend: {e}")
     sys.exit(1)

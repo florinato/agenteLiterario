@@ -18,6 +18,7 @@ function App() {
   const [activeTab, setActiveTab] = useState(null);
   const [selectedFilePath, setSelectedFilePath] = useState(null);
   const [fileContent, setFileContent] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLoadingContent, setIsLoadingContent] = useState(false);
   const [contentError, setContentError] = useState(null);
   const [agentResponse, setAgentResponse] = useState('');
@@ -163,6 +164,8 @@ function App() {
                     filePath={selectedFilePath}
                     content={fileContent}
                     onSave={handleFileSave}
+                    isDarkMode={isDarkMode}
+                    toggleDarkMode={() => setIsDarkMode(prev => !prev)}
                   />
                 )}
               </div>
