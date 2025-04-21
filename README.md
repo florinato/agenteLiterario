@@ -9,6 +9,12 @@ Este es un proyecto de Agente Literario.
 ![Captura de pantalla modo oscuro](CapturaOscuro.png)
 
 ## Instalación
+### Frontend
+
+Para instalar y ejecutar el frontend de este proyecto, siga estos pasos:
+
+1.  Navegue al directorio del frontend: `cd agente_literario_ui/frontend`
+2.  Instale las dependencias: `npm install`
 
 ### Backend
 
@@ -18,15 +24,7 @@ Para instalar y ejecutar el backend de este proyecto, siga estos pasos:
 2.  Cree un entorno virtual: `python3 -m venv venv`
 3.  Active el entorno virtual: `source venv/bin/activate` (Linux/macOS) o `venv\Scripts\activate` (Windows)
 4.  Instale las dependencias: `pip install -r requirements.txt`
-5.  Ejecute la aplicación: `python main.py`
-
-### Frontend
-
-Para instalar y ejecutar el frontend de este proyecto, siga estos pasos:
-
-1.  Navegue al directorio del frontend: `cd agente_literario_ui/frontend`
-2.  Instale las dependencias: `npm install`
-3.  Ejecute la aplicación: `npm run dev`
+5.  Ejecute la aplicación: `python run.py` en el directorio de raiz arrancara el back y el front
 
 ¡Disfrute de su Agente Literario!
 
