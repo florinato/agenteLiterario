@@ -18,6 +18,10 @@ function EditorCanvas({ filePath, content, onSave, isDarkMode, toggleDarkMode })
       styleSelectedText: false,
     });
 
+    simpleMDERef.current.codemirror.on('change', () => {
+      setValue(simpleMDERef.current.value());
+    });
+
     const cm = simpleMDERef.current.codemirror;
     if (!isDarkMode) {
       cm.setOption("theme", "default");
