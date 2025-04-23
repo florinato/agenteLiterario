@@ -3,7 +3,6 @@ from typing import Dict
 
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
-from langchain.memory.chat_message_histories import ChatMessageHistory
 from langchain.prompts import PromptTemplate
 from langchain_community.chat_message_histories import ChatMessageHistory
 
